@@ -2,7 +2,19 @@
 
 This project showcases the approach to incorporate long term memory with llms.
 
+## **Features**
+
+- Supports both OpenAI and Azure OpenAI for chat and embedding models
+- Async provider with support for AsyncOpenAI and AsyncAzureOpenAI
+- Pydantic-based configuration validation (env and YAML)
+- Loguru logging throughout (info, warning, exception)
+
+
 ## **Setup**
+
+<details>
+
+<summary>Click to expand the setup instructions</summary>
 
 I have utilized conda to create and manage the environments.
 
@@ -45,3 +57,5 @@ I have utilized conda to create and manage the environments.
    ```sh
    chainlit run app.py -w
    ```
+
+</details>
