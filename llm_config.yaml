@@ -1,0 +1,13 @@
+provider: "azure"  # or "openai"
+
+openai:
+  api_key: "${OPENAI_API_KEY}"
+  api_base: "${OPENAI_API_BASE}" # optional; default is openai.com
+
+azure:
+  api_key: "${AZURE_OAI_KEY}"
+  endpoint: "${AZURE_OAI_ENDPOINT}"
+  api_version: "${AZURE_OAI_API_VERSION}"
+  chat_deployment: "${AZURE_OAI_DEPLOYMENT_NAME}"
+  embedding_deployment: "${AZURE_OAI_EMBEDDING_DEPLOYMENT_NAME}"
+  embedding_api_version: "${AZURE_OAI_EMBEDDING_API_VERSION}"
