@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.chainlit
+chainlit.md
 .vscode
 *.py[codz]
 *$py.class

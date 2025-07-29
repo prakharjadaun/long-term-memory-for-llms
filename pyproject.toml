@@ -15,3 +15,10 @@ dependencies = [
 dev = [
     "pytest"
 ]
+
+[tool.poetry]
+name = "long-term-memory-for-llms"
+version = "0.1.0"
+packages = [
+  { include = "src", from = "src" }
+]

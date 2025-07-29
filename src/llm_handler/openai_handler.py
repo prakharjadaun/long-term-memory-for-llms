@@ -8,6 +8,8 @@ from loguru import logger
 from openai import AsyncOpenAI, AsyncAzureOpenAI
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+# from src.providers.llm_provider import LLMProvider
+from providers.llm_provider import LLMProvider
 load_dotenv(override=True)
 
 class OpenAIConfig(BaseModel):
@@ -22,7 +24,7 @@ class AzureConfig(BaseModel):
     embedding_deployment: str
     embedding_api_version: Optional[str] = None
 
-class LLMProviderConfig(BaseSettings):
+class OpenAIConfig(BaseSettings):
     provider: Literal["azure", "openai"]
 
     class Config:
@@ -30,7 +32,7 @@ class LLMProviderConfig(BaseSettings):
         env_file_encoding = "utf-8"
         extra = "ignore"  # Ignore extra fields from YAML
 
-class LLMProvider:
+class OpenAIHandler(LLMProvider):
     """
     Initializes and exposes an async LLM client based on provider configuration.
     Supports both Azure OpenAI and standard OpenAI via async clients.
@@ -41,7 +43,7 @@ class LLMProvider:
         try:
             with open(config_path, "r") as f:
                 raw = yaml.safe_load(f)
-            self.cfg = LLMProviderConfig(**raw)
+            self.cfg = OpenAIConfig(**raw)
             
             # Load provider-specific config directly from environment
             if self.cfg.provider == "azure":
@@ -158,7 +160,7 @@ class LLMProvider:
 if __name__ == "__main__":
     import asyncio
     async def main():
-        provider = LLMProvider(config_path="../../llm_config.yaml")
+        provider = OpenAIHandler(config_path="../../llm_config.yaml")
         try:
             await provider.init_client()
         except Exception:
@@ -177,8 +179,8 @@ if __name__ == "__main__":
 
         # Test embeddings
         try:
-            emb = await provider.embed_inputs(["Hello world", "Test"])
-            logger.info("Embedding response: {}", emb)
+            emb = await provider.embed_inputs("Hello world")
+            logger.info("Embedding response: {}", len(emb['data'][0]['embedding']))
         except Exception:
             logger.error("Embedding test failed.")
 
