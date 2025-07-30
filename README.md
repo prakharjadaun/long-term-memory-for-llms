@@ -8,7 +8,7 @@ This project showcases the approach to incorporate long term memory with llms.
 - Async provider with support for AsyncOpenAI and AsyncAzureOpenAI
 - Pydantic-based configuration validation (env and YAML)
 - Loguru logging throughout (info, warning, exception)
-
+- Semantic memory tools (add/update/delete memory via Azure AI Search)
 
 ## **Setup**
 
