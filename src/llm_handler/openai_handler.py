@@ -1,5 +1,3 @@
-# provider.py
-
 import os
 import yaml
 from typing import Literal, Optional
@@ -8,8 +6,8 @@ from loguru import logger
 from openai import AsyncOpenAI, AsyncAzureOpenAI
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-# from src.providers.llm_provider import LLMProvider
 from providers.llm_provider import LLMProvider
+from utilities.llm_config_handler import find_llm_config
 load_dotenv(override=True)
 
 class OpenAIConfig(BaseModel):
@@ -78,7 +76,7 @@ class OpenAIHandler(LLMProvider):
 
         self.client = None
 
-    async def init_client(self) -> None:
+    def init_client(self) -> None:
         """
         Validates and initializes async client for the selected provider.
         """
@@ -160,9 +158,10 @@ class OpenAIHandler(LLMProvider):
 if __name__ == "__main__":
     import asyncio
     async def main():
-        provider = OpenAIHandler(config_path="../../llm_config.yaml")
+        config_path = find_llm_config()
+        provider = OpenAIHandler(config_path=config_path)
         try:
-            await provider.init_client()
+            provider.init_client()
         except Exception:
             logger.error("Initialization failed, exiting.")
             return

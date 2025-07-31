@@ -8,9 +8,9 @@ from datetime import datetime
 class MemoryDocument(BaseModel):
     id: str
     memory: str
-    embeddings: List[float]
+    embeddings: Optional[List[float]]
     category: Optional[str]
-    time: datetime
+    time: Optional[datetime]
 
 
 class VectorDBProvider(ABC):
@@ -39,5 +39,5 @@ class VectorDBProvider(ABC):
         """Return top-k similar documents."""
 
     @abstractmethod
-    async def delete_document(self, doc_id: str) -> bool:
+    async def delete_document(self, doc_ids: List[str]) -> bool:
         """Delete a document by its unique id."""

@@ -7,7 +7,7 @@ class LLMProvider(ABC):
     """
     
     @abstractmethod
-    async def init_client(self) -> None:
+    def init_client(self) -> None:
         """
         Validates and initializes async client for the selected provider.
         """

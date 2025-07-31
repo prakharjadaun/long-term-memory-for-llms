@@ -27,6 +27,7 @@ from azure.search.documents.indexes.models import (
 from azure.search.documents.models import VectorizedQuery
 from providers.vector_db_provider import VectorDBProvider, MemoryDocument
 from dotenv import load_dotenv
+from utilities.llm_config_handler import find_llm_config
 
 load_dotenv(override=True)
 
@@ -37,16 +38,36 @@ class AzureSearchMemoryHandler(VectorDBProvider):
     document ingestion, vector search, and deletion.
     """
 
+    # def __init__(self):
+    #     logger.info("Initializing AzureSearchMemoryHandler")
+    #     self.endpoint = os.getenv("AZURE_AI_SEARCH_ENDPOINT")
+    #     key = os.getenv("AZURE_AI_SEARCH_KEY")
+    #     self.cred = AzureKeyCredential(key)
+    #     self.idx_client = SearchIndexClient(
+    #         endpoint=self.endpoint, credential=self.cred
+    #     )
+    #     self.index_name = os.getenv("INDEX_NAME")
+    #     self.search_client: SearchClient | None = None
+
     def __init__(self):
-        logger.info("Initializing AzureSearchMemoryHandler")
+        # synchronous setup only
+        pass
+    
+    @classmethod
+    async def create(cls):
+        self = cls()
         self.endpoint = os.getenv("AZURE_AI_SEARCH_ENDPOINT")
-        key = os.getenv("AZURE_AI_SEARCH_KEY")
-        self.cred = AzureKeyCredential(key)
+        self.key = os.getenv("AZURE_AI_SEARCH_KEY")
+        self.index_name = os.getenv("INDEX_NAME")
+        self.cred = AzureKeyCredential(self.key)
         self.idx_client = SearchIndexClient(
             endpoint=self.endpoint, credential=self.cred
         )
-        self.index_name = os.getenv("INDEX_NAME")
-        self.search_client: SearchClient | None = None
+        self.search_client = None
+        success = await self.create_index(dims=1536)
+        if not success:
+            raise RuntimeError("Index setup failed")
+        return self
 
     async def index_exists(self) -> bool:
         try:
@@ -61,12 +82,6 @@ class AzureSearchMemoryHandler(VectorDBProvider):
 
     async def create_index(self, dims: int = 1536) -> bool:
         try:
-            if await self.index_exists():
-                self.search_client = SearchClient(
-                    self.endpoint, self.index_name, self.cred
-                )
-                return True
-
             fields = [
                 SimpleField(
                     name="id",
@@ -162,6 +177,8 @@ class AzureSearchMemoryHandler(VectorDBProvider):
             payload = []
             for doc in docs:
                 doc = doc.dict()
+                if 'time' not in doc:
+                    doc['time'] = datetime.now()
                 payload.append(doc)
 
             res = await self.search_client.upload_documents(documents=payload)
@@ -208,9 +225,9 @@ class AzureSearchMemoryHandler(VectorDBProvider):
                     MemoryDocument(
                         id=r["id"],
                         memory=r["memory"],
-                        embeddings=query_emb,
-                        category=r.get("category"),
-                        time=r["time"],
+                        embeddings=None,
+                        category=r['category'],
+                        time=r['time']
                     )
                 )
             logger.info("Vector search returned {} results", len(docs))
@@ -220,21 +237,21 @@ class AzureSearchMemoryHandler(VectorDBProvider):
             logger.exception("Vector search failed on '{}'", self.index_name)
             return []
 
-    async def delete_document(self, doc_id: str) -> bool:
+    async def delete_document(self, doc_ids: List[str]) -> bool:
         assert self.search_client
         try:
-            res = await self.search_client.delete_documents(documents=[{"id": doc_id}])
+            res = await self.search_client.delete_documents(documents=doc_ids)
             succeeded = all(r.succeeded for r in res)
             logger.info(
                 "Deleted document '{}' from '{}', success={}",
-                doc_id,
+                doc_ids,
                 self.index_name,
                 succeeded,
             )
-            return succeeded
+            return True
         except Exception:
             logger.exception(
-                "Deletion failed for doc '{}' in '{}'", doc_id, self.index_name
+                "Deletion failed for doc '{}' in '{}'", doc_ids, self.index_name
             )
             return False
 
@@ -245,9 +262,10 @@ if __name__ == "__main__":
     from llm_handler.openai_handler import OpenAIHandler
 
     async def main():
-        openai_handler = OpenAIHandler(config_path="../../llm_config.yaml")
+        logger.info(find_llm_config())
+        openai_handler = OpenAIHandler(config_path=find_llm_config())
         try:
-            await openai_handler.init_client()
+            openai_handler.init_client()
         except Exception:
             logger.error("Initialization failed, exiting.")
             return
@@ -267,11 +285,11 @@ if __name__ == "__main__":
 
         await handler.add_documents(docs=[doc])
         results = await handler.vector_search(
-            query_emb=embedding["data"][0]["embedding"], top_k=3, category="general"
+            query_emb=embedding["data"][0]["embedding"], top_k=3, category="general_info"
         )
         for res in results:
             print(res)
 
-        await handler.delete_document(doc_id="1")
+        await handler.delete_document(doc_ids=[{"id":"1"}])
 
     asyncio.run(main())

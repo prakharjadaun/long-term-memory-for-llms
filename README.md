@@ -9,6 +9,8 @@ This project showcases the approach to incorporate long term memory with llms.
 - Pydantic-based configuration validation (env and YAML)
 - Loguru logging throughout (info, warning, exception)
 - Semantic memory tools (add/update/delete memory via Azure AI Search)
+- Chainlit-based UI with streaming and session management
+- Structured project layout (prompts, tools, services, handlers)
 
 ## **Setup**
 
