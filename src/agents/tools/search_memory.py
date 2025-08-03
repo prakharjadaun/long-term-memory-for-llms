@@ -4,7 +4,7 @@ from llm_handler.openai_handler import OpenAIHandler
 from utilities.llm_config_handler import find_llm_config
 from providers.vector_db_provider import MemoryDocument
 from loguru import logger
-
+import json
 
 openai_handler_obj = OpenAIHandler(config_path=find_llm_config())
 
@@ -23,7 +23,7 @@ async def search_memory_tool(
                 ][0]["embedding"],
             category=category
         )
-        return documents
+        return json.dumps(documents)
     except Exception as e:
         logger.exception(f"{e}")
         return f"Exception occured while searching in the memory: {e}"

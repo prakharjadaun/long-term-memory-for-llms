@@ -38,19 +38,7 @@ class AzureSearchMemoryHandler(VectorDBProvider):
     document ingestion, vector search, and deletion.
     """
 
-    # def __init__(self):
-    #     logger.info("Initializing AzureSearchMemoryHandler")
-    #     self.endpoint = os.getenv("AZURE_AI_SEARCH_ENDPOINT")
-    #     key = os.getenv("AZURE_AI_SEARCH_KEY")
-    #     self.cred = AzureKeyCredential(key)
-    #     self.idx_client = SearchIndexClient(
-    #         endpoint=self.endpoint, credential=self.cred
-    #     )
-    #     self.index_name = os.getenv("INDEX_NAME")
-    #     self.search_client: SearchClient | None = None
-
     def __init__(self):
-        # synchronous setup only
         pass
     
     @classmethod
@@ -221,14 +209,12 @@ class AzureSearchMemoryHandler(VectorDBProvider):
 
             docs = []
             async for r in results:
-                docs.append(
-                    MemoryDocument(
-                        id=r["id"],
-                        memory=r["memory"],
-                        embeddings=None,
-                        category=r['category'],
-                        time=r['time']
-                    )
+                docs.append({
+                        'id':r["id"],
+                        'memory':r["memory"],
+                        'category':r['category'],
+                        'time':r['time']
+                    }
                 )
             logger.info("Vector search returned {} results", len(docs))
 

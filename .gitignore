@@ -5,6 +5,7 @@ chainlit.md
 .vscode
 *.py[codz]
 *$py.class
+content.json
 
 # C extensions
 *.so
