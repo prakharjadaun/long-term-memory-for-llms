@@ -2,7 +2,7 @@
 name = "long-term-memory-for-llms"
 authors = [{name = "Prakhar Jadaun", email = "prakharvjadaun@gmail.com"}]
 version = "0.1.0"
-requires-python = ">=3.12,<4.0.0"
+requires-python = ">=3.11,<4.0.0"
 dependencies = [
     "requests",
     "chainlit>=2.6.3",
@@ -21,6 +21,4 @@ dev = [
 [tool.poetry]
 name = "long-term-memory-for-llms"
 version = "0.1.0"
-packages = [
-  { include = "src", from = "src" }
-]
+package-mode=false

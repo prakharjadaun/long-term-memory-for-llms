@@ -10,6 +10,8 @@ from agents.tools.delete_memory import delete_memory_tool, delete_memory_tool_de
 from llm_handler.openai_handler import OpenAIHandler
 from prompts.system_prompt import system_message
 from utilities.llm_config_handler import find_llm_config
+from dotenv import load_dotenv
+load_dotenv(override=True)
 
 # Tool schema registrations
 TOOLS = [
@@ -24,6 +26,15 @@ TOOL_MAP = {
     search_memory_tool_definition["name"]: search_memory_tool,
     delete_memory_tool_definition["name"]: delete_memory_tool,
 }
+
+@cl.password_auth_callback
+def auth_callback(username: str, password: str):
+    if (username, password) == (os.getenv('CHAINLIT_EMAIL'), os.getenv('CHAINLIT_PASSWORD')):
+        return cl.User(
+            identifier="user", metadata={"role": "admin", "provider": "credentials"}
+        )
+    else:
+        return None
 
 @cl.on_chat_start
 def start_chat():
@@ -73,7 +84,6 @@ async def main(message: cl.Message):
                     
                     # Processing tool call deltas
                     for tc_delta in delta.tool_calls:
-                        # Extend tool_calls list if needed
                         while len(tool_calls) <= tc_delta.index:
                             tool_calls.append({
                                 "id": "",
@@ -112,12 +122,13 @@ async def main(message: cl.Message):
                     if tc['function']['name'] == add_memory_tool_definition['name']:
                         args['chat_history'] = history
 
+                    logger.info(f"ARGS: {args}")
                     @cl.step(type="tool", name=tc["function"]["name"])
                     async def tool_step():
                         return await tool_fn(**args) if asyncio.iscoroutinefunction(tool_fn) else tool_fn(**args)
 
                     result = await tool_step()
-                    logger.info("Tool result: %s", result)
+                    logger.info(f"Tool result: {result}")
 
                     # Add tool result to history
                     history.append({
