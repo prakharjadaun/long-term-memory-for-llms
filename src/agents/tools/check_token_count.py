@@ -1,5 +1,9 @@
 import tiktoken
-TOKEN_LIMIT = 200
+import os
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
+TOKEN_LIMIT = int(os.getenv('TOKEN_LIMIT'))
 
 async def check_token_count_tool(chat_history):
     global TOKEN_LIMIT
