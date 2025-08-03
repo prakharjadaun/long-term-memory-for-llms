@@ -1,6 +1,5 @@
 categories = [
-  "small_talk",
-  "personal_self_disclosure",
+  "personal_information",
   "emotional_venting",
   "problem_solving_advice_seeking",
   "informational_discourse",
@@ -13,5 +12,4 @@ categories = [
   "health_and_well_being",
   "news_current_events",
   "social_support_validation",
-  "identity_and_preferences"
 ]

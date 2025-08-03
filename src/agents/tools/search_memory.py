@@ -13,6 +13,7 @@ openai_handler_obj.init_client()
 async def search_memory_tool(
     search_text: Annotated[str, "memory segment from the conversation"],
     category: Annotated[str, "category to which the search text belongs to"],
+    **kwargs
 ) -> Union[List[MemoryDocument],str]:
     try:
         logger.info("Searching in the memory...!")

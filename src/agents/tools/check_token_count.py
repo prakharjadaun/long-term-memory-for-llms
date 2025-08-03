@@ -1,13 +1,11 @@
 import tiktoken
-TOKEN_LIMIT = 60
+TOKEN_LIMIT = 200
 
 async def check_token_count_tool(chat_history):
     global TOKEN_LIMIT
     enc = tiktoken.encoding_for_model("gpt-4o")
     
     def count_tokens(msg):
-        print(msg)
-        print(type(msg))
         if msg["role"] == "system":
             return 0
         elif msg["role"] == "tool":

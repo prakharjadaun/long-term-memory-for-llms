@@ -14,7 +14,8 @@ openai_handler_obj = OpenAIHandler(config_path=find_llm_config())
 openai_handler_obj.init_client()
 
 async def add_memory_tool(
-    chat_history: Annotated[List[dict], "Chat history"]
+    chat_history: Annotated[List[dict], "Chat history"],
+    **kwargs
 ) -> bool:
     try:
         memory_handler_obj =  await AzureSearchMemoryHandler.create()
@@ -43,13 +44,13 @@ async def add_memory_tool(
         )
         if status:
             logger.info("successfully added to the memory store")
-            return {"status": "successfully added to the memory store", "chat_history": chat_history[:1]}
+            return {"status": "successfully added to the memory store"}
         else:
             logger.warning("failed to add the segment to memory store")
-            return {"status": "failed to add the segment to memory store", "chat_history": chat_history}
+            return {"status": "failed to add the segment to memory store"}
     except Exception as e:
         logger.exception(f"{e}")
-        return {"status": f"Exception occured while adding memory: {e}", "chat_history": chat_history}
+        return {"status": f"Exception occured while adding memory: {e}"}
 
 
 

@@ -18,6 +18,7 @@ Generate the summary in the below JSON format.
 ## Guidelines:
 - Generate the response in JSON format containing the list of dictionaries having the memory and category key.
 - Strictly give the relevant information in the memory key.
+- Avoid generating redundant segments. 
 """ + f"""Here are the categories from which you need to pick the category from:
 {categories}
 """
